@@ -1,0 +1,36 @@
+import { DatabaseError, Pool } from "pg";
+import { Product } from "./product";
+import { PG_ERRORS } from "../db/postgress-errors";
+import { NegativeProductPriceError, NegativeProductStock } from "./product.errors";
+
+export class ProductRepository {
+  constructor(private db: Pool) { }
+
+  async insertProduct(data: {
+    name: string, price: number, stock_quantity: number
+  }): Promise<Product> {
+    try {
+      const results = await this.db.query(`
+        INSERT into PRODUCT (name, price, stock_quantity) 
+        VALUES ($1, $2, $3)
+        RETURNING *
+      `, [data.name, data.price, data.stock_quantity]);
+
+      return results.rows[0];
+    } catch (error) {
+      console.error("Error inserting Product", error);
+      if (error instanceof DatabaseError && error.code === PG_ERRORS.CONSTRAIN_VIOLATION) {
+        if (error.constraint === "products_price_positive") {
+          throw new NegativeProductPriceError(data.name, data.price);
+        }
+        if (error.constraint === "products_stock_non_negative") {
+          throw new NegativeProductStock(data.name, data.stock_quantity);
+        }
+        throw error;
+      }
+      throw error;
+    }
+
+  }
+
+}
