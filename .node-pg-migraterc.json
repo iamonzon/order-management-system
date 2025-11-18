@@ -1,0 +1,11 @@
+{
+  "database-url-var": "DATABASE_URL",
+  "migrations-dir": "migrations",
+  "dir": "migrations",
+  "direction": "up",
+  "count": 1,
+  "migration-file-language": "sql",
+  "create-schema": true,
+  "schema": "public",
+  "check-order": true
+}
