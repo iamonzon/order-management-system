@@ -3,24 +3,40 @@ import app from "./app";
 import pool from "./db/pool";
 import { GracefulShutdown } from "./utils/graceful-shutdown";
 
-const port = process.env.PORT || 3000;
-const server = app.listen(port, () =>
-  console.log(`🚀 Server running on port ${port}`)
-);
+async function checkDatabaseConnection(): Promise<void> {
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ Database connection verified');
+  } catch (error) {
+    console.error('❌ Failed to connect to database:', error instanceof Error ? error.message : error);
+    process.exit(1);
+  }
+}
 
-const shutdown = new GracefulShutdown(10000);
-shutdown.register(async () => {
-  await pool.end();
-  console.log(`Database pool closed`);
-})
+async function startServer(): Promise<void> {
+  await checkDatabaseConnection();
 
-shutdown.register(async () => {
-  return new Promise((resolve) => {
-    server.close(() => {
-      console.log('HTTP server closed');
-      resolve();
+  const port = process.env.PORT || 3000;
+  const server = app.listen(port, () =>
+    console.log(`🚀 Server running on port ${port}`)
+  );
+
+  const shutdown = new GracefulShutdown(10000);
+  shutdown.register(async () => {
+    await pool.end();
+    console.log(`Database pool closed`);
+  });
+
+  shutdown.register(async () => {
+    return new Promise((resolve) => {
+      server.close(() => {
+        console.log('HTTP server closed');
+        resolve();
+      });
     });
   });
-})
 
-shutdown.listen()
+  shutdown.listen();
+}
+
+startServer();
