@@ -2,10 +2,10 @@ import { StatusCodes } from "http-status-codes";
 import { AppError } from "../types/app-error";
 
 export class ProductNotFoundError extends AppError {
-  constructor(public readonly productId: number) {
+  constructor(public readonly productId?: number) {
     super(
       StatusCodes.NOT_FOUND,
-      `Product with id ${productId} not found`
+      productId ? `Product with id ${productId} not found` : 'One or more products not found'
     )
   }
 }

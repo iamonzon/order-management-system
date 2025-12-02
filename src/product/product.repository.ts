@@ -1,10 +1,23 @@
 import { DatabaseError, Pool } from "pg";
 import { Product } from "./product";
 import { PG_ERRORS } from "../db/postgress-errors";
-import { NegativeProductPriceError, NegativeProductStock } from "./product.errors";
+import { NegativeProductPriceError, NegativeProductStock, ProductNotFoundError } from "./product.errors";
 
 export class ProductRepository {
   constructor(private db: Pool) { }
+
+  async findById(id: number): Promise<Product> {
+    const result = await this.db.query(
+      'SELECT * FROM products WHERE id = $1',
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      throw new ProductNotFoundError(id);
+    }
+
+    return result.rows[0];
+  }
 
   async insertProduct(data: {
     name: string, price: number, stock_quantity: number
