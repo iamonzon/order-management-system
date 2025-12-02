@@ -24,6 +24,12 @@ const productController = new ProductController(productService);
 export const container = {
   db: pool,
 
+  services: {
+    orderService: orderService,
+    customerService: customerService,
+    productService: productService,
+  },
+
   v1: {
     orderController: orderController,
     customerController: customerController,
