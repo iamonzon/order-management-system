@@ -32,7 +32,6 @@ export class OrderRepository {
 
   async createOrder(data: {
     customer_id: number;
-    total: number;
     items: OrderItem[]
   }): Promise<Order> {
     return withTransaction(this.dbPool, async client => {

@@ -6,9 +6,9 @@ import { GracefulShutdown } from "./utils/graceful-shutdown";
 async function checkDatabaseConnection(): Promise<void> {
   try {
     await pool.query('SELECT 1');
-    console.log('✅ Database connection verified');
+    console.log(`✅ Database connection verified: ${process.env.DATABASE_URL}`);
   } catch (error) {
-    console.error('❌ Failed to connect to database:', error instanceof Error ? error.message : error);
+    console.error(`❌ Failed to connect to database: ${process.env.DATABASE_URL}`, error instanceof Error ? error.message : error);
     process.exit(1);
   }
 }

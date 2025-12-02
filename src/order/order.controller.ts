@@ -6,7 +6,7 @@ export class OrderController {
   constructor(private orderService: OrderService) { }
 
   async findOrder(req: Request, res: Response): Promise<void> {
-    const order = await this.orderService.findOrder(req.params.id);
+    const order = await this.orderService.findOrder(Number(req.params.id));
     res.status(StatusCodes.OK).json(order)
   }
 
