@@ -2,7 +2,7 @@ import { Router } from "express";
 import { Container } from "../core/container";
 import { createV1Routes } from "./v1";
 import { createHealthRoutes } from "./health";
-import { createGraphQLRoutes } from "../graphql/schema";
+import { createGraphQLRoutes } from "./graphql";
 
 export function createRoutes(container: Container) {
   const router = Router();

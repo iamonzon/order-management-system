@@ -27,6 +27,7 @@ export const container = {
   services: {
     orderService: orderService,
     customerService: customerService,
+    productService: productService,
   },
 
   v1: {
