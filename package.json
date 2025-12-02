@@ -9,10 +9,10 @@
     "clean": "rm -rf dist",
     "test": "node --test --require tsx --require ./test/setup.ts 'test/**/*.test.ts'",
     "test:watch": "node --test --watch --require tsx 'test/**/*.test.ts'",
-    "migrate": "node-pg-migrate",
-    "migrate:up": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down",
-    "migrate:create": "node-pg-migrate create"
+    "migrate": "node-pg-migrate -m src/db/migrations",
+    "migrate:up": "node-pg-migrate up -m src/db/migrations",
+    "migrate:down": "node-pg-migrate down -m src/db/migrations",
+    "migrate:create": "node-pg-migrate create -m src/db/migrations"
   },
   "keywords": [],
   "author": "",
