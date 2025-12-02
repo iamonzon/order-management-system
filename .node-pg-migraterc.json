@@ -1,10 +1,8 @@
 {
   "database-url-var": "DATABASE_URL",
-  "migrations-dir": "migrations",
-  "dir": "migrations",
-  "direction": "up",
-  "count": 1,
-  "migration-file-language": "sql",
+  "migrations-dir": "src/db/migrations",
+  "dir": "src/db/migrations",
+  "migration-file-language": "js",
   "create-schema": true,
   "schema": "public",
   "check-order": true
