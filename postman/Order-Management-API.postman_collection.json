@@ -1,0 +1,563 @@
+{
+	"info": {
+		"_postman_id": "order-management-api-collection",
+		"name": "Order Management API",
+		"description": "A comprehensive collection for testing the Order Management System API.\n\n## Getting Started\n\n1. Start the application:\n   ```bash\n   docker-compose up -d\n   npm run migrate:up\n   npm run dev\n   ```\n\n2. Import this collection into Postman\n\n3. Follow the numbered workflow to test the full flow:\n   - Create a Customer\n   - Create a Product\n   - Create an Order\n   - Query the Order\n\n## Base URL\n\nThe collection uses a variable `{{baseUrl}}` set to `http://localhost:3000` by default.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Health Checks",
+			"item": [
+				{
+					"name": "Liveness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health/live",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "health", "live"]
+						},
+						"description": "Simple liveness probe to check if the server is running."
+					},
+					"response": []
+				},
+				{
+					"name": "Readiness Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health/ready",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "health", "ready"]
+						},
+						"description": "Readiness probe that verifies database connectivity."
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints for monitoring application status."
+		},
+		{
+			"name": "REST API",
+			"item": [
+				{
+					"name": "Customers",
+					"item": [
+						{
+							"name": "Create Customer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.collectionVariables.set('customerId', response.id);",
+											"    console.log('Customer created with ID:', response.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "customers"]
+								},
+								"description": "Create a new customer. The customer ID is automatically saved to use in subsequent requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Customer by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/customers/{{customerId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "customers", "{{customerId}}"]
+								},
+								"description": "Retrieve a customer by their ID."
+							},
+							"response": []
+						},
+						{
+							"name": "List Customers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/customers?page=1&limit=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "customers"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"description": "Page number (default: 1)"
+										},
+										{
+											"key": "limit",
+											"value": "20",
+											"description": "Items per page (default: 20, max: 100)"
+										}
+									]
+								},
+								"description": "Get a paginated list of all customers."
+							},
+							"response": []
+						}
+					],
+					"description": "Customer management endpoints"
+				},
+				{
+					"name": "Products",
+					"item": [
+						{
+							"name": "Create Product",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.collectionVariables.set('productId', response.id);",
+											"    console.log('Product created with ID:', response.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Wireless Mouse\",\n    \"price\": 29.99,\n    \"stock_quantity\": 100\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "products"]
+								},
+								"description": "Create a new product. The product ID is automatically saved to use when creating orders."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "products", "{{productId}}"]
+								},
+								"description": "Retrieve a product by its ID."
+							},
+							"response": []
+						},
+						{
+							"name": "List Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/products?page=1&limit=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "products"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"description": "Page number (default: 1)"
+										},
+										{
+											"key": "limit",
+											"value": "20",
+											"description": "Items per page (default: 20, max: 100)"
+										}
+									]
+								},
+								"description": "Get a paginated list of all products."
+							},
+							"response": []
+						}
+					],
+					"description": "Product management endpoints"
+				},
+				{
+					"name": "Orders",
+					"item": [
+						{
+							"name": "Create Order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    const response = pm.response.json();",
+											"    pm.collectionVariables.set('orderId', response.id);",
+											"    console.log('Order created with ID:', response.id);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"customer_id\": {{customerId}},\n    \"items\": [\n        {\n            \"product_id\": {{productId}},\n            \"quantity\": 2\n        }\n    ]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/orders",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "orders"]
+								},
+								"description": "Create a new order for the customer with the specified products. Uses the customer and product IDs from previous requests."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Order by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "orders", "{{orderId}}"]
+								},
+								"description": "Retrieve an order by its ID, including all order items."
+							},
+							"response": []
+						},
+						{
+							"name": "List Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/orders?page=1&limit=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "v1", "orders"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1",
+											"description": "Page number (default: 1)"
+										},
+										{
+											"key": "limit",
+											"value": "20",
+											"description": "Items per page (default: 20, max: 100)"
+										}
+									]
+								},
+								"description": "Get a paginated list of all orders with their items."
+							},
+							"response": []
+						}
+					],
+					"description": "Order management endpoints"
+				}
+			],
+			"description": "RESTful API endpoints for managing customers, products, and orders.\n\n## Workflow\n\n1. Create a Customer\n2. Create a Product\n3. Create an Order (using customer and product IDs)\n4. List or Get entities as needed"
+		},
+		{
+			"name": "GraphQL API",
+			"item": [
+				{
+					"name": "Mutations",
+					"item": [
+						{
+							"name": "Create Customer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response.data && response.data.createCustomer) {",
+											"        pm.collectionVariables.set('customerId', response.data.createCustomer.id);",
+											"        console.log('Customer created with ID:', response.data.createCustomer.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreateCustomer($input: CreateCustomerInput!) {\n    createCustomer(input: $input) {\n        id\n        name\n        email\n        created_at\n    }\n}",
+										"variables": "{\n    \"input\": {\n        \"name\": \"Jane Smith\",\n        \"email\": \"jane.smith@example.com\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Create a new customer using GraphQL mutation."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Product",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response.data && response.data.createProduct) {",
+											"        pm.collectionVariables.set('productId', response.data.createProduct.id);",
+											"        console.log('Product created with ID:', response.data.createProduct.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreateProduct($input: CreateProductInput!) {\n    createProduct(input: $input) {\n        id\n        name\n        price\n        stock_quantity\n    }\n}",
+										"variables": "{\n    \"input\": {\n        \"name\": \"Mechanical Keyboard\",\n        \"price\": 149.99,\n        \"stock_quantity\": 50\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Create a new product using GraphQL mutation."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Order",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    const response = pm.response.json();",
+											"    if (response.data && response.data.createOrder) {",
+											"        pm.collectionVariables.set('orderId', response.data.createOrder.id);",
+											"        console.log('Order created with ID:', response.data.createOrder.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreateOrder($input: CreateOrderInput!) {\n    createOrder(input: $input) {\n        id\n        customer_id\n        status\n        total_amount\n        created_at\n        items {\n            id\n            product_id\n            quantity\n            price_at_purchase\n        }\n    }\n}",
+										"variables": "{\n    \"input\": {\n        \"customer_id\": 1,\n        \"items\": [\n            {\n                \"product_id\": 1,\n                \"quantity\": 3\n            }\n        ]\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Create a new order using GraphQL mutation. Update the variables with valid customer_id and product_id."
+							},
+							"response": []
+						}
+					],
+					"description": "GraphQL mutations for creating resources."
+				},
+				{
+					"name": "Queries",
+					"item": [
+						{
+							"name": "Get Customer by Email",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetCustomer($email: String!) {\n    customer(email: $email) {\n        id\n        name\n        email\n        created_at\n    }\n}",
+										"variables": "{\n    \"email\": \"jane.smith@example.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Query a customer by their email address."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetProduct($id: ID!) {\n    product(id: $id) {\n        id\n        name\n        price\n        stock_quantity\n    }\n}",
+										"variables": "{\n    \"id\": \"1\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Query a product by its ID."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Order with Items",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query GetOrder($id: ID!) {\n    order(id: $id) {\n        id\n        customer_id\n        status\n        total_amount\n        created_at\n        items {\n            id\n            product_id\n            quantity\n            price_at_purchase\n        }\n    }\n}",
+										"variables": "{\n    \"id\": \"1\"\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Query an order by its ID, including all order items."
+							},
+							"response": []
+						}
+					],
+					"description": "GraphQL queries for fetching resources."
+				},
+				{
+					"name": "GraphQL Playground",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/graphql",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "graphql"]
+						},
+						"description": "Open this URL in a browser to access the GraphQL Yoga playground for interactive query building."
+					},
+					"response": []
+				}
+			],
+			"description": "GraphQL API endpoints for querying and mutating data.\n\nThe GraphQL endpoint also provides an interactive playground when accessed via browser."
+		}
+	]
+}

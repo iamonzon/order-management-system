@@ -1,6 +1,7 @@
 import { CreateOrderDTO } from "./order.dto";
 import { Order } from "./order";
 import { OrderRepository } from "./order.repository";
+import { PaginatedResult, PaginationParams } from "../types/pagination";
 
 export class OrderService {
   constructor(private repository: OrderRepository) { }
@@ -13,6 +14,10 @@ export class OrderService {
   }
 
   async findOrder(id: number): Promise<Order> {
-    return this.repository.findOrder(id)
+    return this.repository.findOrder(id);
+  }
+
+  async list(params: PaginationParams): Promise<PaginatedResult<Order>> {
+    return this.repository.findAll(params.page, params.limit);
   }
 }

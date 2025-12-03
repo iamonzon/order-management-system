@@ -8,8 +8,12 @@ import { notFoundHandler } from './middleware/not-found-handler';
 import { container } from './core/container';
 const app = express();
 
-// Security
-app.use(helmet());
+// Security - disable CSP for GraphQL playground in development
+app.use(
+  helmet({
+    contentSecurityPolicy: process.env.NODE_ENV === 'production',
+  })
+);
 app.use(cors())
 
 // Monitoring

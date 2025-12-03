@@ -5,10 +5,11 @@ import { Container } from "../../core/container";
 
 export function createOrderRoutes(container: Container) {
   const controller = container.v1.orderController;
-  const router = Router()
+  const router = Router();
 
-  router.get('/:id', controller.findOrder)
-  router.post('/', validate(CreateOrderSchema), controller.createOrder)
+  router.get('/', (req, res) => controller.listOrders(req, res));
+  router.get('/:id', (req, res) => controller.findOrder(req, res));
+  router.post('/', validate(CreateOrderSchema), (req, res) => controller.createOrder(req, res));
 
   return router;
 }
