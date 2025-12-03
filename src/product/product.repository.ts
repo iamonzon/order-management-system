@@ -2,6 +2,7 @@ import { DatabaseError, Pool } from "pg";
 import { Product } from "./product";
 import { PG_ERRORS } from "../db/postgress-errors";
 import { NegativeProductPriceError, NegativeProductStock, ProductNotFoundError } from "./product.errors";
+import { PaginatedResult } from "../types/pagination";
 
 export class ProductRepository {
   constructor(private db: Pool) { }
@@ -17,6 +18,30 @@ export class ProductRepository {
     }
 
     return result.rows[0];
+  }
+
+  async findAll(page: number, limit: number): Promise<PaginatedResult<Product>> {
+    const offset = (page - 1) * limit;
+
+    const [dataResult, countResult] = await Promise.all([
+      this.db.query(
+        'SELECT * FROM products ORDER BY id DESC LIMIT $1 OFFSET $2',
+        [limit, offset]
+      ),
+      this.db.query('SELECT COUNT(*) FROM products')
+    ]);
+
+    const total = parseInt(countResult.rows[0].count, 10);
+
+    return {
+      data: dataResult.rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   async insertProduct(data: {

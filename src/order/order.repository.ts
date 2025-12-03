@@ -5,13 +5,14 @@ import { Order, OrderItem } from "./order";
 import { InvalidOrderDataError, OrderNotFoundError } from "./order.errors";
 import { PG_ERRORS } from "../db/postgress-errors";
 import { ProductNotFoundError } from "../product/product.errors";
+import { PaginatedResult } from "../types/pagination";
 
 export class OrderRepository {
   constructor(private dbPool: Pool) { }
 
   async findOrder(id: number): Promise<Order> {
     const result = await this.dbPool.query(`
-        SELECT 
+        SELECT
           o.*,
           json_agg(json_build_object(
             'id', oi.id,
@@ -28,6 +29,41 @@ export class OrderRepository {
     if (result.rowCount === 0)
       throw new OrderNotFoundError(id)
     return result.rows[0]
+  }
+
+  async findAll(page: number, limit: number): Promise<PaginatedResult<Order>> {
+    const offset = (page - 1) * limit;
+
+    const [dataResult, countResult] = await Promise.all([
+      this.dbPool.query(`
+        SELECT
+          o.*,
+          json_agg(json_build_object(
+            'id', oi.id,
+            'product_name', oi.product_name,
+            'quantity', oi.quantity,
+            'price', oi.price
+          )) as items
+        FROM orders o
+        LEFT JOIN order_items oi ON oi.order_id = o.id
+        GROUP BY o.id
+        ORDER BY o.created_at DESC
+        LIMIT $1 OFFSET $2
+      `, [limit, offset]),
+      this.dbPool.query('SELECT COUNT(*) FROM orders')
+    ]);
+
+    const total = parseInt(countResult.rows[0].count, 10);
+
+    return {
+      data: dataResult.rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   async createOrder(data: {
