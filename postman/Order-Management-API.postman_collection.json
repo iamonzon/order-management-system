@@ -488,6 +488,32 @@
 							"response": []
 						},
 						{
+							"name": "List Customers",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ListCustomers($page: Int, $limit: Int) {\n    customers(page: $page, limit: $limit) {\n        data {\n            id\n            name\n            email\n            created_at\n        }\n        pagination {\n            page\n            limit\n            total\n            totalPages\n        }\n    }\n}",
+										"variables": "{\n    \"page\": 1,\n    \"limit\": 20\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Get a paginated list of all customers."
+							},
+							"response": []
+						},
+						{
 							"name": "Get Product by ID",
 							"request": {
 								"method": "POST",
@@ -514,6 +540,32 @@
 							"response": []
 						},
 						{
+							"name": "List Products",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ListProducts($page: Int, $limit: Int) {\n    products(page: $page, limit: $limit) {\n        data {\n            id\n            name\n            price\n            stock_quantity\n        }\n        pagination {\n            page\n            limit\n            total\n            totalPages\n        }\n    }\n}",
+										"variables": "{\n    \"page\": 1,\n    \"limit\": 20\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Get a paginated list of all products."
+							},
+							"response": []
+						},
+						{
 							"name": "Get Order with Items",
 							"request": {
 								"method": "POST",
@@ -536,6 +588,32 @@
 									"path": ["api", "graphql"]
 								},
 								"description": "Query an order by its ID, including all order items."
+							},
+							"response": []
+						},
+						{
+							"name": "List Orders",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ListOrders($page: Int, $limit: Int) {\n    orders(page: $page, limit: $limit) {\n        data {\n            id\n            customer_id\n            status\n            total_amount\n            created_at\n            items {\n                id\n                product_id\n                quantity\n                price_at_purchase\n            }\n        }\n        pagination {\n            page\n            limit\n            total\n            totalPages\n        }\n    }\n}",
+										"variables": "{\n    \"page\": 1,\n    \"limit\": 20\n}"
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/graphql",
+									"host": ["{{baseUrl}}"],
+									"path": ["api", "graphql"]
+								},
+								"description": "Get a paginated list of all orders with their items."
 							},
 							"response": []
 						}

@@ -1,6 +1,7 @@
 import { createSchema, createYoga } from "graphql-yoga";
 import { Router } from "express";
 import { Container } from "../core/container";
+import { MAX_LIMIT } from "../types/pagination";
 
 const typeDefs = `
   type Customer {
@@ -33,6 +34,28 @@ const typeDefs = `
     items: [OrderItem!]!
   }
 
+  type Pagination {
+    page: Int!
+    limit: Int!
+    total: Int!
+    totalPages: Int!
+  }
+
+  type CustomerList {
+    data: [Customer!]!
+    pagination: Pagination!
+  }
+
+  type ProductList {
+    data: [Product!]!
+    pagination: Pagination!
+  }
+
+  type OrderList {
+    data: [Order!]!
+    pagination: Pagination!
+  }
+
   input CreateCustomerInput {
     name: String!
     email: String!
@@ -56,8 +79,11 @@ const typeDefs = `
 
   type Query {
     customer(email: String!): Customer
+    customers(page: Int = 1, limit: Int = 20): CustomerList!
     product(id: ID!): Product
+    products(page: Int = 1, limit: Int = 20): ProductList!
     order(id: ID!): Order
+    orders(page: Int = 1, limit: Int = 20): OrderList!
   }
 
   type Mutation {
@@ -77,6 +103,10 @@ export function createGraphQLRoutes(container: Container) {
         customer: async (_: unknown, { email }: { email: string }) => {
           return customerService.findByEmail(email);
         },
+        customers: async (_: unknown, { page, limit }: { page: number; limit: number }) => {
+          const safeLimit = Math.min(limit, MAX_LIMIT);
+          return customerService.list({ page, limit: safeLimit });
+        },
         product: async (_: unknown, { id }: { id: string }) => {
           try {
             return await productService.findProduct(Number(id));
@@ -84,12 +114,20 @@ export function createGraphQLRoutes(container: Container) {
             return null;
           }
         },
+        products: async (_: unknown, { page, limit }: { page: number; limit: number }) => {
+          const safeLimit = Math.min(limit, MAX_LIMIT);
+          return productService.list({ page, limit: safeLimit });
+        },
         order: async (_: unknown, { id }: { id: string }) => {
           try {
             return await orderService.findOrder(Number(id));
           } catch {
             return null;
           }
+        },
+        orders: async (_: unknown, { page, limit }: { page: number; limit: number }) => {
+          const safeLimit = Math.min(limit, MAX_LIMIT);
+          return orderService.list({ page, limit: safeLimit });
         },
       },
       Mutation: {
